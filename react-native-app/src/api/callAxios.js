@@ -1,11 +1,11 @@
 import axios from "axios";
 import { apiAdress } from "./apiAddress";
 
-export const callAxios = async (endpoint, method, params) => {
+export const callAxios = async (endpoint, method, config = null) => {
         return await axios({
             method: method,
-            url: `${apiAdress}/${endpoint}`,
-            data: params
+            url: `${apiAdress}${endpoint}`,
+            config
         })
         .catch((error) => {
           console.log('Lỗi: ' + error);

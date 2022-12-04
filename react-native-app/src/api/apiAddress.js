@@ -1,5 +1,6 @@
-const apiAdress = 'http://192.168.1.9:8000/api/';
-const storagePost = 'http://192.168.1.9:8000/storage/posts/';
-const storageUser = 'http://192.168.1.9:8000/storage/users/';
+const origin        = 'http://192.168.1.16:8000';
+const apiAdress     = origin + '/api/';
+const storagePost   = origin + '/storage/posts/';
+const storageUser   = origin + '/storage/users/';
 
 export {apiAdress, storagePost, storageUser}

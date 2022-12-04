@@ -48,8 +48,8 @@ const DetailFoodScreen = ({navigation}) => {
           <View style={styles.infoUser}>
             <Image resizeMode="contain" source={require('../../assets/img/user/user_test1.jpg')} style={{width: 40, height: 40, borderRadius: 40/2, borderWidth: 1}}/>
             <View>
-              <Text style={{paddingHorizontal: 8, fontSize: 13, color: color.black, fontWeight: 'bold', paddingBottom: 3}}>Quang Nguyen</Text>
-              <Text style={{paddingHorizontal: 8, fontSize: 10, color: color.grayOriginal}}>28/09/2022 lúc 19:30  •  Gà rán Popeyes - Bình Thạnh</Text>
+              <Text style={{paddingHorizontal: 8, fontSize: 13, color: color.black, fontFamily: 'nunito_semibold', paddingBottom: 3}}>Quang Nguyen</Text>
+              <Text style={{paddingHorizontal: 8, fontSize: 10, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>28/09/2022 lúc 19:30  •  Gà rán Popeyes - Bình Thạnh</Text>
             </View>
           </View>
         </View>
@@ -76,12 +76,12 @@ const DetailFoodScreen = ({navigation}) => {
         </View>
 
         <View style={styles.content}>
-          <Text style={{fontWeight: 'bold', fontSize: 18}}>Gà rán sốt cay Hàn Quốc tại Bình Thạnh ngon ngon ngon</Text>
+          <Text style={{fontFamily: 'nunito_bold', fontSize: 18}}>Gà rán sốt cay Hàn Quốc tại Bình Thạnh ngon ngon ngon</Text>
           <Text style={{paddingVertical: 8, fontSize: 13}}>
-          <Entypo name="star" style={{fontSize: 13, color: color.main}}/> <Text style={{fontWeight: 'bold'}}>4.3</Text>/5 điểm
+          <Entypo name="star" style={{fontSize: 13, color: color.main}}/> <Text style={{fontFamily: 'nunito_semibold'}}>4.3</Text>/5 điểm
           </Text>
 
-          <Text style={{lineHeight: 25}}>Mọi người đã thử thưởng thức món này chưa?
+          <Text style={{lineHeight: 25, fontFamily: 'nunito_normal'}}>Mọi người đã thử thưởng thức món này chưa?
             Hôm trước thấy quán này có chướng trình khuyến mãi trên Now nên mình gọi thử về ăn . Cơ mà siu ngon luôn. Cơm dẻo, gà thơm, nước sốt cực đỉnh, quan trọng gà đến nơi vẫn ấm và giòn tan ăn cực đã ý. Mình là người ăn cay tốt nên mình chọn vị cay.. ăn rất thích nhưng mà lần sau sẽ gọi loại siêu cay xem thế nào. Gà giòn ăn cùng kim chi chua nhẹ rất hợp. À kim chi ở quán này ăn ngon phết đó mọi người. Hôm mình ăn quán còn đang có chương trình tặng gimpab nữa. Đơn hàng gửi đến hộp hiếc xin sò nhìn như ảnh luôn kèm theo cái gimpab siêu to khổng lồ kình ăn ko hết nổi. Gimpab ăn 1 nửa, 1 nửa chiều mới lấy ra ăn mà cơm vẫn dẻo ngon ý
             Nói túm lại đây là quán online chất lượng nhất mà mình từng mò đươc trên Now. Chắc chắn sẽ ủng hộ quán dài dài
             Share cho mọi người đường link cho dễ tìm kiếm nhé.
@@ -92,11 +92,11 @@ const DetailFoodScreen = ({navigation}) => {
           <Image style={styles.imgFoodPlace} source={{uri: 'https://kenh14cdn.com/2018/2/7/6-151797495481038039623.jpg '}}/>
 
           <View style={styles.infoFoodPlace}>
-            <Text style={{fontWeight: 'bold', fontSize: 13}}>No Name Chicken - Gà rán Hotdog Q1</Text>
-            <Text style={{fontSize: 12}}>112 Kios 12 Phạm Viết Chánh, P. Nguyễn Cư Trinh, Q1, TPHCM</Text>
+            <Text style={{fontFamily: 'nunito_bold', fontSize: 13}}>No Name Chicken - Gà rán Hotdog Q1</Text>
+            <Text style={{fontSize: 12, fontFamily: 'nunito_normal'}}>112 Kios 12 Phạm Viết Chánh, P. Nguyễn Cư Trinh, Q1, TPHCM</Text>
             <Text style={{fontSize: 12}}>
               <Entypo name="star" style={{color: color.main}}/>
-              <Text style={{fontWeight: 'bold'}}> 4.5
+              <Text style={{fontFamily: 'nunito_semibold'}}> 4.5
               </Text>/5 điểm (15 bài review) 
             </Text>
           </View>
@@ -108,17 +108,17 @@ const DetailFoodScreen = ({navigation}) => {
               <TouchableOpacity>
                 <Ionicons style={{fontSize: 25, color: color.main}} name='heart'/>
               </TouchableOpacity>
-              <Text style={{fontSize: 13, paddingLeft: 5, color: color.grayOriginal}}>15 người thích</Text>
+              <Text style={{fontSize: 13, paddingLeft: 5, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>15 người thích</Text>
             </View>
-            <Text style={{fontSize: 13, color: color.grayOriginal}}>2 bình luận</Text>
+            <Text style={{fontSize: 13, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>2 bình luận</Text>
           </View>
 
-          <Text style={{fontSize: 15, marginVertical: 20, fontWeight: 'bold'}}>Bình luận</Text>
+          <Text style={{fontSize: 15, marginVertical: 20, fontFamily: 'nunito_semibold'}}>Bình luận</Text>
 
           <View style={{marginBottom: 100}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Image resizeMode='contain' source={require('../../assets/img/user/user_test1.jpg')} style={{width: 40, height: 40, borderRadius: 24}}/>
-              <TextInput style={{paddingHorizontal: 15, width: '85%', height: 40, backgroundColor: color.grayBackgroundImg, borderRadius: 20}} placeholder="Viết bình luận..."/>
+              <TextInput style={{paddingHorizontal: 15, width: '85%', height: 40, backgroundColor: color.grayBackgroundImg, borderRadius: 20, fontFamily: 'nunito_semibold'}} placeholder="Viết bình luận..."/>
             </View>
           </View>
 
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   },
   wrapPageNumber:{
     color: color.white,
-    fontWeight: 'bold',
+    fontFamily: 'nunito_semibold',
     paddingHorizontal: 13,
     paddingVertical: 5,
     borderRadius: 15,

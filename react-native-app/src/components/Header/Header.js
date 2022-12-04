@@ -32,7 +32,8 @@ const styles = StyleSheet.create({
       color: color.white,
       width: 350,
       fontSize: 16,
-      fontWeight: 'bold',
+      fontFamily: 'nunito_bold',
       paddingHorizontal: 10,
+      
     }
 })

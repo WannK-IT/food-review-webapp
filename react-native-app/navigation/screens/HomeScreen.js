@@ -7,7 +7,7 @@ import Post from "../../src/components/Post/Post";
 
 const HomeScreen = ({navigation}) => {
   const directDetail = () => {
-    navigation.navigate('DetailFood');
+    navigation.navigate('DetailScreen');
   }
 
   return (

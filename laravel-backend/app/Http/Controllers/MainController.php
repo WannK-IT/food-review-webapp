@@ -6,14 +6,18 @@ use Illuminate\Support\Facades\Validator;
 
 class MainController extends Controller
 {
-    public function sendResponse($result, $message){
+    public function sendResponse($result, $message = null){
 
         // array response
+
         $response = [
             'success' => true,
             'data' => $result,
-            'message' => $message
         ];
+
+        if($message != null){
+            $response['message'] = $message;
+        }
 
         return response()->json($response, 200);
     }

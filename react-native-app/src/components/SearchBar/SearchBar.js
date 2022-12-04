@@ -21,10 +21,11 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    backgroundColor: color.white
   },
   city:{
-    fontWeight: 'bold',
+    fontFamily: 'nunito_normal',
     marginHorizontal: 10
   },
   input:{
@@ -35,5 +36,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: color.gray,
     borderRadius: 20,
+    fontFamily: 'nunito_normal'
   }
 });

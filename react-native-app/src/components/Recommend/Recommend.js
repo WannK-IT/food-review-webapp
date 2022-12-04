@@ -1,18 +1,29 @@
-import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, ImageBackground } from 'react-native'
 import React, { useState, useEffect } from 'react'
+
 import color from '../../color'
+import { apiAdress } from '../../api/apiAddress'
+import axios from 'axios'
 
 const Recommend = (props) => {
-  const [data, setData] = useState([])
+  const [categories, setCategories] = useState([])
   const [isLoading, setLoading] = useState(true)
-  const urlGetRecommend = 'https://63300ccaf5fda801f8d9deb4.mockapi.io/api/recommend'
+  const urlCategories = apiAdress + 'categories'
 
   useEffect(() => {
-    fetch(urlGetRecommend)
-    .then((response) => response.json())
-    .then((json) => setData(json))
-    .catch((error) => console.error(error))
-    .finally(() => setLoading(false));
+    // fetch(urlCategories)
+    // .then((response) => response.json())
+    // .then((json) => setCategories(json))
+    // .catch((error) => console.error(error))
+    // .finally(() => setLoading(false));
+
+    axios.get(urlCategories)
+    .then((response) => {
+      setCategories(response.data.data)
+      setLoading(false)
+    }).catch((error) => {
+      console.log(error);
+    })
   }, [])
 
   return (
@@ -22,10 +33,13 @@ const Recommend = (props) => {
           isLoading ? <ActivityIndicator style={{flex: 1, alignItems: 'center', justifyContent: 'center'}} size="large" color={color.main} /> :
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {
-              data.map((recommend_food, index) => (
+              categories.map((recommend_food, index) => (
                 <TouchableOpacity key={index} style={[styles.panelItem, styles.shadowBorder]} onPress={props.directDetailFood}>
-                  <Image resizeMode="contain" style={styles.image} source={{uri: 'https://media.foody.vn/res/g95/940490/prof/s/foody-upload-api-foody-mobile-c__media_temp-_-food-200117144919.jpg'}}/>
-                  <Text style={styles.title}>{recommend_food.title}</Text>
+                  <ImageBackground resizeMode="cover" style={styles.image} source={{uri: 'https://media.cooky.vn/images/blog-2016/trua-nay-an-gi-com-tam(1).jpg'}}>
+                    <View style={styles.contrastImage}>
+                    </View>
+                  </ImageBackground>
+                  <Text style={styles.textTitle}>{recommend_food.category_name}</Text>
                 </TouchableOpacity>
               ))
             }
@@ -39,37 +53,37 @@ export default Recommend
 
 const styles = StyleSheet.create({
   recommend:{
-    height: 200,
+    height: 150,
     marginVertical: 3,
+    backgroundColor: color.white
   },
   textRecommend:{
     paddingVertical: 5,
     paddingHorizontal: 15,
-    fontWeight: 'bold',
+    fontFamily: 'nunito_semibold',
     borderLeftWidth: 6,
     borderLeftColor: color.main,
-    fontSize: 15
+    fontSize: 15,
   },
   panelItem:{
     marginTop: 15,
     marginHorizontal: 5,
-    width: 170,
+    width: 150,
     maxHeight: 150,
     borderColor: color.gray,
     borderWidth: 1,
-    borderRadius: 13,
+    borderRadius: 8,
+    marginBottom: 5
   },
   image:{
-    height: 100,
-    borderTopLeftRadius: 13,
-    borderTopRightRadius: 13
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+    overflow: 'hidden'
   },
-  title:{
-    flexShrink: 1,
-    fontWeight: 'bold',
-    fontSize: 13,
-    paddingTop: 5,
-    paddingHorizontal: 8
+  contrastImage: {
+    flex: 1, 
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   shadowBorder:{
     backgroundColor: color.white,
@@ -82,5 +96,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.24,
     shadowRadius: 4,
     borderRadius: 8,
+  },
+  textTitle:{
+    position: 'absolute', 
+    color: color.white, 
+    bottom: 5,
+    left: 8,
+    fontSize: 15,
+    fontFamily: 'nunito_lightbold',
+    textShadowColor: '#000', 
+    textShadowOffset: 
+      { width: 0.3, 
+        height: 0.3 
+      }, 
+    textShadowRadius: 10
   }
 })

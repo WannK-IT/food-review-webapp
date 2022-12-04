@@ -14,6 +14,7 @@ class PlaceFood extends Model
     protected $fillable = [
         'place_name',
         'address',
+        'city',
         'avatar',
         'time_opening',
         'phone',

@@ -1,28 +1,66 @@
 import { View, Text, TextInput, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, {useState, useContext} from 'react'
 import color from '../../src/color'
 import { FontAwesome } from '@expo/vector-icons';
+import { AuthContext } from '../../src/context/AuthContext';
+import Spinner from "react-native-loading-spinner-overlay";
 
 const WIDTH = (Dimensions.get('window').width)
 const HEIGHT = (Dimensions.get('window').height)
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
+
+  const [email, setemail] = useState(null)
+  const [password, setpassword] = useState(null)
+  const [disabledButton, setDisabledButton] = useState(true)
+
+  const {isLoading, login} = useContext(AuthContext)
+
+  const directToRegister = () => {
+    navigation.navigate("RegisterScreen")
+  }
+
+  const checkDisableLogin = () => {
+    if(email !== null && password !== null){
+      if(email.length > 0  && password.length > 0 ){
+        setDisabledButton(false)
+      }else{
+        setDisabledButton(true)
+      }
+    }else{
+      setDisabledButton(true)
+    }
+  }
+
+  
   return (
     <View style={styles.container}>
+      <Spinner visible={isLoading}/>
       <Image resizeMode='cover' style={styles.logo} source={require("../../assets/logo-bg.png")} />
 
       <View style={styles.login}>
         <View style={{marginHorizontal: 50}}>
           <TextInput
+            value={email}
             style={styles.inputText}
             placeholder="Email"
+            onChangeText={(emailText) => {
+              setemail(emailText)
+              checkDisableLogin()
+            }}
           />
           <TextInput
+            value={password}
+            secureTextEntry={true}
             style={styles.inputText}
-            placeholder="Password"
+            placeholder="Mật khẩu"
+            onChangeText={(passwordText) => {
+              setpassword(passwordText)
+              checkDisableLogin()
+            }}
           />
 
-          <TouchableOpacity style={[styles.button, {backgroundColor: color.main}]}>
+          <TouchableOpacity disabled={disabledButton} style={disabledButton ? [styles.button, {backgroundColor: 'gray'}] : [styles.button, {backgroundColor: color.main}]} onPress={() => login(email, password)}>
             <Text style={{color: color.white, fontWeight: 'bold'}}>Đăng nhập</Text>
           </TouchableOpacity>
 
@@ -40,12 +78,14 @@ const LoginScreen = () => {
 
           <View style={{flexDirection: 'column', alignItems: 'center', marginTop: 30}}>
             <TouchableOpacity style={{marginBottom: 10}}>
-              <Text style={{color: color.main, fontSize: 12, fontWeight: 'bold'}}>Quên mật khẩu ?</Text>
+              <Text style={{color: color.main, fontSize: 12}}>Quên mật khẩu ?</Text>
             </TouchableOpacity>
 
             <View style={{flexDirection: 'row'}}>
               <Text style={{color: color.grayOriginal, fontSize: 12}}>Chưa có tài khoản?</Text>
-              <TouchableOpacity><Text style={{paddingLeft: 4, color: color.main, fontSize: 12}}>Đăng ký ngay</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => directToRegister()}>
+                <Text style={{paddingLeft: 4, color: color.main, fontSize: 12, fontWeight: 'bold'}}>Đăng ký ngay</Text>
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -63,7 +103,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logo: {
-    marginTop: 50,
+    marginTop: 30,
   },
   login: {
     width: WIDTH, 

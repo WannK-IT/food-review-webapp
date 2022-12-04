@@ -5,35 +5,29 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MainController;
 use App\Models\Post;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Post as PostResource;
+use App\Repositories\PostRepository;
+use App\Repositories\CategoriesPostRepository;
 
 class PostController extends MainController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
-    {
-        $posts = DB::table("posts")
-            ->join("users", "posts.id_user", "=", "users.id")
-            ->join("medias", "posts.id", "=", "medias.id_post")
-            ->select("posts.*", "users.fullname", "users.avatar", "medias.title AS image_food")
-            ->orderBy("posts.id", "DESC")
-            ->get();
+    protected $postRepository;
+    protected $categoryPostRepository;
 
-        return $this->sendResponse($posts, 'Fetch posts successfully');
+    public function __construct()
+    {
+        $this->postRepository = new PostRepository;
+        $this->categoryPostRepository = new CategoriesPostRepository;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    public function index()
+    {   
+        $posts = $this->postRepository->getAllPost();
+
+        return $this->sendResponse($posts);
+    }
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -50,28 +44,16 @@ class PostController extends MainController
         }
 
         $post = Post::create($data);
-        return $this->sendResponse(new PostResource($post), 'Create post successfully');
+        return $this->sendResponse(new PostResource($post));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function show($id)
     {
         $post = Post::find($id);
-        return $this->sendResponse(new PostResource($post), 'Retrieved data successfully');
+        return $this->sendResponse(new PostResource($post));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(Request $request, Post $post)
     {
         $data = $request->all();
@@ -88,19 +70,18 @@ class PostController extends MainController
         }
 
         $post->update($data);
-        return $this->sendResponse(new PostResource($post), 'Update post successfully');
+        return $this->sendResponse(new PostResource($post));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
+    public function getAllCategoriesPost(){
+        $data = $this->categoryPostRepository->getAllCategories();
+        return $this->sendResponse($data);
+    }
+    
     public function destroy(Post $post)
     {
         $post->delete();
-        return $this->sendResponse([], 'Delete post successfully');
+        return $this->sendResponse([]);
     }
 
     
