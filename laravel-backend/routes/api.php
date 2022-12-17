@@ -34,19 +34,43 @@ Route::post("checkPassword", [AuthController::class, 'checkPassword']);
 Route::middleware('auth:api')->group(function() {
     
 });
+
 // Posts
 Route::apiResource('posts', PostController::class);
+Route::post('add-post', [PostController::class, 'insert']);
+Route::get('get-single-post/{id}', [PostController::class, 'getPostById']);
+Route::get('get-post-map-category/{category_id}', [PostController::class, "getPostMapCategory"]);
+
 Route::get('get-category-post', [PostController::class, 'getAllCategoriesPost']);
+Route::get('get-relate-post/{id}', [PostController::class, 'getRelatePost']);
+Route::get('get-detail-post/{id}', [PostController::class, 'getDetailPost']);
+Route::get('get-post-and-user/{id}', [PostController::class, 'getListPostAndUser']);
+Route::get('get-list-post-by-user/{id}', [PostController::class, 'getListPostByUser']);
+Route::get('count-post-by-user/{id}', [PostController::class, 'countPostByUser']);
+Route::get('count-post-by-cate', [PostController::class, 'countPostByCate']);
+Route::get('getAllMedia/{user_id}', [PostController::class, 'getAllMediaByUserId']);
+Route::get('getAllPostByUser/{user_id}', [PostController::class, 'getAllPostByUserId']);
+
+//get image
+Route::get('get-list-image/{id}', [PostController::class, 'getListImage']);
+Route::get('get-list-image-by-user/{id}', [PostController::class, 'getListImageByUser']);
+//Comment
+Route::post('comment', [PostController::class, 'saveComment']);
+Route::get('get-list-comment/{id}', [PostController::class, 'getListCommnet']);
 
 // Categories
 Route::apiResource('categories', CategoryController::class);
+Route::get('get-category-post', [PostController::class, 'getAllCategoriesPost']);
+Route::get('get-detail-cate/{id}', [CategoryController::class, 'getDetailCate']);
 
 // User
 Route::apiResource('user', UserController::class);
+Route::get('get-detail-user/{id}', [UserController::class, 'getDetailUser']);
 
 //PlaceFood
 Route::post("add-food-place/{user_id}", [PlaceFoodController::class, 'addNewFoodPlace']);
 Route::get("get-all-food-place", [PlaceFoodController::class, 'getAll']);
+Route::get('getAllFoodPlaceByUser/{user_id}', [PlaceFoodController::class, 'getAllPlaceFoodByUserId']);
 
 
 

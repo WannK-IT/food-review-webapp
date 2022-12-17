@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "react-native-app",
+    "name": "Foodify",
     "slug": "react-native-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,13 +18,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wannk.foodify",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo-bg.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.wannk.foodify"
     },
     "web": {
       "favicon": "./assets/favicon.png"

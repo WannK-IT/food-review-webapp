@@ -7,15 +7,15 @@ import Post from "../../src/components/Post/Post";
 
 const HomeScreen = ({navigation}) => {
   const directDetail = () => {
-    navigation.navigate('DetailScreen');
+    return navigation;
   }
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={true}>
         <SearchBar />
-        <Recommend directDetailFood={directDetail}/>
-        <Post directDetailFood={directDetail}/>
+        <Recommend directDetailFood={navigation}/>
+        <Post directDetailFood={navigation}/>
       </ScrollView>
     </View>
   );

@@ -7,22 +7,31 @@ use Illuminate\Http\Request;
 use App\Repositories\PlaceFoodRepository;
 use Illuminate\Support\Facades\DB;
 use App\Models\PlaceFood;
+use App\Repositories\PostRepository;
+use App\Services\PostService;
 // use Faker\Provider\Image;
 // use Illuminate\Support\Facades\URL;
 
 class PlaceFoodController extends MainController
 {
     private $placeFoodRepository;
+    private $postRepository;
+    private $postService;
 
     public function __construct()
     {
         $this->placeFoodRepository = new PlaceFoodRepository;
+        $this->postRepository = new PostRepository;
+        $this->postService = new PostService;
     }
 
     public function getAll(){
-        $data = PlaceFood::all();
+        $data = PlaceFood::all()->toArray();
+        $listIdData = array_column($data, 'id');
+        $listPostInListIds = $this->postRepository->getPostByListIdPlaceFood($listIdData);
+        $repairDataPost = $this->postService->repairDataPost($data, $listPostInListIds);
 
-        return $this->sendResponse($data);
+        return $this->sendResponse($repairDataPost);
     }
 
     public function addNewFoodPlace(Request $request, $user_id){
@@ -32,6 +41,11 @@ class PlaceFoodController extends MainController
         });
 
         return $this->sendResponse([], 'Thêm bài viết thành công');
+    }
+
+    public function getAllPlaceFoodByUserId($user_id){
+        $data = PlaceFood::where("id_user", $user_id)->get();
+        return $this->sendResponse($data);
     }
     
     // public function uploadImagePlaceFood(Request $request){

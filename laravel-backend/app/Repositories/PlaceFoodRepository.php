@@ -26,6 +26,5 @@ class PlaceFoodRepository{
         $this->modelClass->save();
 
     }
-    
 }
 ?>

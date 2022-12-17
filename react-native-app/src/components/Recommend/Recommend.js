@@ -11,12 +11,6 @@ const Recommend = (props) => {
   const urlCategories = apiAdress + 'categories'
 
   useEffect(() => {
-    // fetch(urlCategories)
-    // .then((response) => response.json())
-    // .then((json) => setCategories(json))
-    // .catch((error) => console.error(error))
-    // .finally(() => setLoading(false));
-
     axios.get(urlCategories)
     .then((response) => {
       setCategories(response.data.data)
@@ -34,8 +28,10 @@ const Recommend = (props) => {
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {
               categories.map((recommend_food, index) => (
-                <TouchableOpacity key={index} style={[styles.panelItem, styles.shadowBorder]} onPress={props.directDetailFood}>
-                  <ImageBackground resizeMode="cover" style={styles.image} source={{uri: 'https://media.cooky.vn/images/blog-2016/trua-nay-an-gi-com-tam(1).jpg'}}>
+                <TouchableOpacity key={index} style={[styles.panelItem, styles.shadowBorder]} onPress={() => props.directDetailFood.navigate('CategoriesPostScreen',{
+                  category_id: recommend_food.id
+                })}>
+                  <ImageBackground resizeMode="cover" style={styles.image} source={{uri: recommend_food.image}}>
                     <View style={styles.contrastImage}>
                     </View>
                   </ImageBackground>

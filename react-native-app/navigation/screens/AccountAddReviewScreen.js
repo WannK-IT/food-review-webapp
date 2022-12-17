@@ -6,6 +6,7 @@ import Modal from "react-native-modal";
 import { SelectList } from 'react-native-dropdown-select-list'
 import axios from 'axios';
 import * as ImagePicker from "expo-image-picker";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import { messageToast } from '../../src/functions';
 import color from '../../src/color'
@@ -14,8 +15,10 @@ import { apiAdress } from '../../src/api/apiAddress';
 import { AuthContext } from '../../src/context/AuthContext';
 import { firebase } from "../../config"
 import { getStringDate } from '../../src/functions';
+import { round } from 'react-native-reanimated';
 
-const AccountAddReviewScreen = () => {
+
+const AccountAddReviewScreen = ({navigation}) => {
 
   const {userInfo} = useContext(AuthContext)
   const [isModalAddPostVisible, setModalAddPostVisible] = useState(false);
@@ -37,26 +40,49 @@ const AccountAddReviewScreen = () => {
       city: '',
       image: '',
     })
+    const [isLoadingAddNewPlace, setIsLoadingAddNewPlace] = useState(false); 
 
   /** End Add New Place State */
   
   /** Add New Post State */
+    /** Star Rating */
+    const [defaultRating, setDefaultRating] = useState({
+      hygiene: 2,
+      price: 2,
+      taste: 2,
+      space: 2,
+      service: 2,
+    })
+    
+    const [maxRate, setMaxRate] = useState({
+      hygiene: [1, 2, 3, 4, 5],
+      price: [1, 2, 3, 4, 5],
+      taste: [1, 2, 3, 4, 5],
+      space: [1, 2, 3, 4, 5],
+      service: [1, 2, 3, 4, 5],
+    })
+
+    const starImgFilled = <AntDesign name="star" style={{marginHorizontal: 3, color: color.main }} size={20}/>
+    const starImgCorner = <AntDesign name="staro" style={{marginHorizontal: 3 }} size={20}/>
+    /** End Star Rating */
+
     const [dataNewPost, setDataNewPost] = useState({
       title: '',
       content: '',
       vote: 0,
-      rate: 0,
       id_cat_post: '',
       id_user: userInfo.user.id,
       id_food_place: '',
+      image: null
     })
+    
     const [placeFoodSelected, setPlaceFoodSelected] = useState({
       name: '',
       address: '',
       avatar: ''
     })
-  /** End Add New Post State */
 
+  /** End Add New Post State */
 
   const toggleModalAddPlace = () => {
     setModalAddPlaceVisible(!isModalAddPlaceVisible);
@@ -72,6 +98,7 @@ const AccountAddReviewScreen = () => {
       city: '',
       image: ''
     })
+    setIsLoadingAddNewPlace(false)
   };
 
   const getAllPlaceFood = () => {
@@ -116,9 +143,10 @@ const AccountAddReviewScreen = () => {
         let blob = await response.blob();
         imageNewPlace = getStringDate() + '_' + dataNewPlace.image.substring(dataNewPlace.image.lastIndexOf('/') + 1)
         var ref = firebase.storage().ref('place').child(imageNewPlace).put(blob)
-
+        setIsLoadingAddNewPlace(true)
         try {
           await ref
+          
         } catch (error) {
           console.log(error);
         }finally{
@@ -161,29 +189,104 @@ const AccountAddReviewScreen = () => {
       getAllPlaceFood()
     }
   }
+
+  const addNewPost = async () => {
+
+    if(!dataNewPost.title || !dataNewPost.content || !dataNewPost.id_cat_post || !dataNewPost.id_food_place || !dataNewPost.image){
+      messageToast('error', 'Thông báo', 'Hãy điền đầy đủ thông tin cho bài đăng', 2500)
+    }else{
+        var imageNewPost = [];
+
+        if(dataNewPost.image){
+          if(typeof(dataNewPost.image) == 'string'){
+
+            let response = await fetch(dataNewPost.image)
+            let blob = await response.blob();
+            imageNewPost = getStringDate() + '_' + dataNewPost.image.substring(dataNewPost.image.lastIndexOf('/') + 1)
+            var ref = firebase.storage().ref('post').child(imageNewPost).put(blob)
+            // setIsLoadingAddNewPlace(true)
+            try {
+              await ref
+              
+            } catch (error) {
+              console.log(error);
+            }finally{
+              await firebase.storage().ref('post/' + imageNewPost).getDownloadURL().then((result) => {
+                imageNewPost = result
+              })
+            }
+          }else{
+            dataNewPost.image.map(async (dataImage) => {
+              let response = await fetch(dataImage.uri)
+              let blob = await response.blob();
+              let imageNewPostTemp = getStringDate() + '_' + dataImage.uri.substring(dataImage.uri.lastIndexOf('/') + 1)
+              var ref = firebase.storage().ref('post').child(imageNewPostTemp).put(blob)
+              // setIsLoadingAddNewPlace(true)
+              try {
+                await ref
+              } catch (error) {
+                console.log(error);
+              }
+            }) 
+
+            imageNewPost = dataNewPost.image.map((item) => {
+              return getStringDate() + '_' + item.uri.substring(item.uri.lastIndexOf('/') + 1)
+            })
+          }
+        }
+
+        let config = {
+          validateStatus: function(status){
+            return true;
+          },
+          headers: {
+            accept : 'application/json',
+          }
+        }
+
+        let data = {
+          ...dataNewPost, rate: defaultRating, image: imageNewPost
+        }
+
+        // Axios post 
+        axios.post(apiAdress + 'add-post', data, config)
+        .then((response) => {
+          if(response.data.success == true){
+            navigation.navigate('AccountInfoDrawer')
+          }
+        }).catch(error => {
+          console.log(error);
+        })
+    }
+  }
+
   /** End Modal Add Place Part */
-  const pickImage = async (option) => {
-    // No permissions request is necessary for launching the image library
+  const pickImageNewPlace = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: (option == 'addNewPlace') ? true : false,
-      allowsMultipleSelection: (option == 'addNewPost') ? true : false,
+      allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-
     if (!result.cancelled) {
-      switch (option) {
-        case 'addNewPlace':
-          setDataNewPlace({...dataNewPlace, image: result.uri})
-          break;
-        case 'addNewPost':
-          
-          break;
-      }
+      setDataNewPlace({...dataNewPlace, image: result.uri})
     }
   };
+
+  const pickImageNewPost = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setDataNewPost({...dataNewPost, image: (!result.selected) ? result.uri : result.selected})
+    }
+  }; 
 
   const showImageFoodPlace = (image) => {
     if(!image){
@@ -192,10 +295,29 @@ const AccountAddReviewScreen = () => {
       return <Image resizeMode='contain' style={{width: 100, height: 80, borderRadius: 8, borderWidth: 1}} source={{uri : image}}/>
     }
   }
-console.log(dataNewPost);
+
+  const showImageNewPost = (image) => {
+    if(image){
+      return <View style={{flexDirection: 'row', justifyContent: 'center', flexWrap: "wrap"}}>
+          {
+          typeof(image) == 'string' ? 
+            <Image resizeMode='cover' style={{width: 100, height: 100, marginTop: 10}} source={{uri: image}}/> :
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{flexDirection: 'row', marginTop: 10, }}>
+              {image.map((item, key) => (
+                  <Image key={key} resizeMode="cover" style={{width: 100, height: 100, marginHorizontal: 5}} source={{uri: item.uri}}/>
+                ))}
+            </ScrollView>
+          }
+          
+        </View>
+    }
+  }
+
+
   useEffect(() => {
     getAllPlaceFood()
     getAllCategoriesPost()
+    
   }, [])
     
   return (
@@ -203,6 +325,7 @@ console.log(dataNewPost);
      <View style={styles.header}>
 
       <Modal isVisible={isModalAddPlaceVisible} onBackdropPress={() =>  setModalAddPlaceVisible(!isModalAddPlaceVisible)}>
+        <Spinner visible={isLoadingAddNewPlace}/>
         <ScrollView style={{ flex:1, width: '100%', backgroundColor: color.white}}>
           <View style={{borderBottomWidth: 1, borderBottomColor: color.grayOriginal, paddingVertical: 10, marginVertical: 10, marginHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
             <Text style={{fontFamily: 'nunito_semibold', fontSize: 18}}>Thêm địa điểm mới</Text>
@@ -214,7 +337,7 @@ console.log(dataNewPost);
           {/* If exist Image => Hide pick image, show image picked */}
           {
           !dataNewPlace.image ? 
-          <TouchableOpacity style={[styles.part_upload, {marginHorizontal: 20}]} onPress={() => pickImage('addNewPlace')}>
+          <TouchableOpacity style={[styles.part_upload, {marginHorizontal: 20}]} onPress={() => pickImageNewPlace()}>
             <Entypo name="images" size={30} color={color.grayOriginal} />
             <Text style={{fontSize: 14, fontFamily: 'nunito_semibold', paddingLeft: 8, color: color.grayOriginal, fontWeight: 'bold'}}>Thêm hình ảnh địa điểm</Text>
           </TouchableOpacity> : 
@@ -321,7 +444,13 @@ console.log(dataNewPost);
                   <View>
                     <Text style={{fontFamily: 'nunito_semibold', fontSize: 16}}>{valuePlaceFood.place_name}</Text>
                     <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14, color: color.grayOriginal}}>{valuePlaceFood.address}</Text>
-                    <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>3/4 Sao ( 15 bài review )</Text>
+                    <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>{
+                      !valuePlaceFood.rate ? 'Chưa có bài review' : 
+                      <View>
+                        <Text style={{fontFamily: 'Nunito_400Regular'}}>{Math.round((valuePlaceFood.rate / valuePlaceFood.count)*2) / 2 + '/5' + ' sao'}</Text>
+                        <Text style={{fontFamily: 'Nunito_400Regular'}}>{valuePlaceFood.count + ' bài review'}</Text>
+                      </View>
+                    }</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -334,27 +463,31 @@ console.log(dataNewPost);
         <Text style={{color: color.white, fontFamily: 'nunito_semibold'}}>Thêm địa điểm</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.buttonPost}>
+      <TouchableOpacity style={styles.buttonPost} onPress={() => addNewPost()}>
         <Text style={{color: color.white, fontFamily: 'nunito_semibold'}}>Đăng bài</Text>
       </TouchableOpacity>
      </View>
 
      <View style={styles.content}>
-      <TouchableOpacity style={styles.part_upload} onPress={() => pickImage('addNewPost')}>
+      <TouchableOpacity style={styles.part_upload} onPress={() => pickImageNewPost()}>
         <Entypo name="images" size={30} color={color.grayOriginal} />
         <Text style={{fontSize: 14, fontFamily: 'nunito_semibold', paddingLeft: 8, color: color.grayOriginal, fontWeight: 'bold'}}>Thêm hình ảnh</Text>
       </TouchableOpacity>
+
+      {showImageNewPost(dataNewPost.image)}
 
       <View style={styles.part_contentPost}>
         <TextInput 
           style={styles.part_contentPost_title}
           placeholder="Nhập tiêu đề review"
+          onChangeText={(text) => setDataNewPost({...dataNewPost, title: text})}
         />  
         <TextInput 
           style={styles.part_contentPost_content}
           placeholder="Nhập nội dung review"
           multiline={true}
           textAlignVertical={'top'}
+          onChangeText={(text) => setDataNewPost({...dataNewPost, content: text})}
         />  
       </View>
 
@@ -419,55 +552,65 @@ console.log(dataNewPost);
         <View style={styles.part_review_field}>
           <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>Vệ sinh</Text>
           <View style={{flexDirection: 'row', marginLeft: 20}}>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
+            {maxRate.hygiene.map((rating, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => setDefaultRating({...defaultRating, hygiene: rating})}>
+                  {rating <= defaultRating.hygiene ? starImgFilled : starImgCorner}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 
         <View style={styles.part_review_field}>
           <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>Giá cả</Text>
           <View style={{flexDirection: 'row', marginLeft: 20}}>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
+            {maxRate.price.map((rating, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => setDefaultRating({...defaultRating, price: rating})}>
+                  {rating <= defaultRating.price ? starImgFilled : starImgCorner}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 
         <View style={styles.part_review_field}>
           <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>Hương vị</Text>
           <View style={{flexDirection: 'row', marginLeft: 20}}>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
+            {maxRate.taste.map((rating, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => setDefaultRating({...defaultRating, taste: rating})}>
+                  {rating <= defaultRating.taste ? starImgFilled : starImgCorner}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 
         <View style={styles.part_review_field}>
           <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>Không gian</Text>
           <View style={{flexDirection: 'row', marginLeft: 20}}>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
+            {maxRate.space.map((rating, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => setDefaultRating({...defaultRating, space: rating})}>
+                  {rating <= defaultRating.space ? starImgFilled : starImgCorner}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
 
         <View style={styles.part_review_field}>
           <Text style={{fontFamily: 'Nunito_400Regular', fontSize: 14}}>Dịch vụ</Text>
           <View style={{flexDirection: 'row', marginLeft: 20}}>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
-            <AntDesign name="staro" style={{marginHorizontal: 3}} size={20}/>
+            {maxRate.service.map((rating, index) => {
+              return (
+                <TouchableOpacity key={index} onPress={() => setDefaultRating({...defaultRating, service: rating})}>
+                  {rating <= defaultRating.service ? starImgFilled : starImgCorner}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
       </View>

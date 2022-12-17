@@ -18,5 +18,7 @@ class Review extends Model
         'space',
         'service',
         'id_post',
+        'created_at',
+        'updated_at',
     ];
 }

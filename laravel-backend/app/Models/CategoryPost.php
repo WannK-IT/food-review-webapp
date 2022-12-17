@@ -13,6 +13,7 @@ class CategoryPost extends Model
 
     protected $fillable = [
         'category_name',
+        'image',
         'status',
         'created_at',
         'updated_at',

@@ -12,10 +12,15 @@ class CategoriesPostRepository{
 
     public function getAllCategories(){
         $data = $this->modelClass::where('status', 'active')
-        ->select("id", "category_name")
+        ->select("id", "category_name", "image")
         ->get();
 
         return $data;
+    }
+
+    public function getCategoryById($id){
+        $result = $this->modelClass::where("id", $id)->select("*")->get();
+        return $result;
     }
     
 }

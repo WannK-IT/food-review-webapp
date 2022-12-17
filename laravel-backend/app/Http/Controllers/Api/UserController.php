@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use DB;
 class UserController extends MainController
 {
     private $userRepository;
@@ -111,5 +111,10 @@ class UserController extends MainController
     public function destroy($id)
     {
         //
+    }
+	public function getDetailUser( $id ) {
+        $data = array();
+        $data = DB::table('users') -> where('id', $id) -> first();
+        return $this->sendResponse($data);
     }
 }

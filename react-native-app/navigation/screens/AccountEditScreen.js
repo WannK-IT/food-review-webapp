@@ -24,7 +24,7 @@ const AccountEditScreen = ({navigation}) => {
   const [selected, setSelected] = useState('');
   const [avatar, setAvatar] = useState('');
   const [date, setDate] = useState(new Date());
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState('');
   const [loadingAvatar, setLoadingAvatar] = useState(false)
   const [newAvatar, setNewAvatar] = useState(false);
 
@@ -99,13 +99,14 @@ const AccountEditScreen = ({navigation}) => {
 
     // Delete old avatar in firebase storage
     if(newAvatar){
-      let oldImage = firebase.storage().ref('avatar').child(userInfo.user.avatar)
-
-      oldImage.delete().then((response) => {
-        console.log('Delete old image successfully');
-      }).catch((error) => {
-        console.log('Fail to delete old image');
-      });
+      if(userInfo.user.avatar){
+        let oldImage = firebase.storage().ref('avatar').child(userInfo.user.avatar)
+        oldImage.delete().then((response) => {
+          console.log('Delete old image successfully');
+        }).catch((error) => {
+          console.log('Fail to delete old image');
+        });
+      }
     }
 
     if(image){
@@ -118,6 +119,12 @@ const AccountEditScreen = ({navigation}) => {
         await ref
       } catch (error) {
         console.log(error);
+      }finally{
+        await firebase.storage().ref('avatar/' + fileNameAvatar).getDownloadURL().then((result) => {
+          fileNameAvatar = result
+        }).catch((error) => {
+          console.log(error);
+        })
       }
 
       setImage('')
@@ -163,14 +170,11 @@ const AccountEditScreen = ({navigation}) => {
     setAvatar((userInfo.user.avatar) ? userInfo.user.avatar : '')
 
     setLoadingAvatar(true)
-    if(userInfo.user.avatar != null){
-      firebase.storage().ref('avatar').child(userInfo.user.avatar).getDownloadURL()
-      .then((url) => {
-        setImage(url)
-        setLoadingAvatar(false)
-      }).catch(error => console.log(error))
+    if(userInfo.user.avatar){
+      setImage(userInfo.user.avatar)
+      setLoadingAvatar(false)
     }else{
-      setImage(null)
+      setImage('')
       setLoadingAvatar(false)
     }
     

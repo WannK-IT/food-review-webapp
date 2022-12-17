@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\MainController;
 use Illuminate\Http\Request;
 use App\Models\CategoryPost;
-
+use App\Repositories\CategoriesPostRepository;
+use DB;
 class CategoryController extends MainController
 {
     /**
@@ -27,7 +28,7 @@ class CategoryController extends MainController
      */
     public function store(Request $request)
     {
-        //
+        // TODO
     }
 
     /**
@@ -38,7 +39,7 @@ class CategoryController extends MainController
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
@@ -62,5 +63,10 @@ class CategoryController extends MainController
     public function destroy($id)
     {
         //
+    }
+	public function getDetailCate( $id ) {
+        $data = array();
+        $data = DB::table('category_posts') -> where('id', $id) -> first();
+        return $this->sendResponse($data);
     }
 }

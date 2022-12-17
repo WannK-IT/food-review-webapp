@@ -9,6 +9,7 @@ export default{
     black: 'black',
     white: 'white',
     red: 'red',
+    yellow: 'yellow',
 
     facebook: '#527ad0',
     google: '#d52b2c'

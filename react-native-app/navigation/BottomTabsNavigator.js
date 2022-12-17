@@ -53,6 +53,7 @@ export default function BottomTabsNavigator() {
           tabBarIcon: ({ color }) => (
             <Entypo name="home" color={color} size={24} />
           ),
+          
         }}
       />
       <Tab.Screen

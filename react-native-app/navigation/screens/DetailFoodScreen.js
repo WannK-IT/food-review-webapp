@@ -1,30 +1,39 @@
 import { StyleSheet, Text, View, ScrollView, Image, Dimensions, TouchableOpacity, TextInput } from 'react-native'
-import React, {useState} from 'react'
-import { Entypo, Ionicons } from '@expo/vector-icons'; 
+import React, {useState, useEffect} from 'react'
+import { Entypo, Ionicons, Feather } from '@expo/vector-icons'; 
 
-import Header from '../../src/components/Header/Header';
 import color from '../../src/color';
-
-const images = [
-  {
-    id: 1,
-    url: 'https://daotaovuabep.com/wp-content/uploads/2020/04/ga_chien_han_quoc.jpg'
-  },
-  {
-    id: 2,
-    url: 'https://static.riviu.co/960/image/2021/03/28/8f68228f08f016229be1840cbadf7690_output.jpeg'
-  },
-  {
-    id: 3,
-    url: 'https://static.riviu.co/960/image/2021/03/28/cb277a713b836e5e9f7a413b7894350d_output.jpeg'
-  }
-]
+import axios from 'axios';
+import { apiAdress } from '../../src/api/apiAddress';
 
 const WIDTH = (Dimensions.get('window').width)
 const HEIGHT = (Dimensions.get('window').height)
 
-const DetailFoodScreen = ({navigation}) => {
+const DetailFoodScreen = ({route, navigation}) => {
   const [imgActive, setImgActive] = useState(0)
+  const [dataPost, setDataPost] = useState([])
+
+  const { idPost, idFoodPlace } = route.params;
+
+  const user_undefined = 'react-native-app/assets/user_undefined.jpg'
+  const user_fullname = dataPost.user_fullname
+  const user_avatar = dataPost.user_avatar
+
+  
+  const post_created_at = dataPost.post_created_at
+  const post_image = dataPost.image_post
+  const post_title = dataPost.post_title
+  const post_rate = dataPost.post_rate
+  const post_content = dataPost.post_content
+  const post_vote = dataPost.post_vote
+
+  const place_food_undefined = 'react-native-app/assets/untitled_place.png'
+  const place_food_address = dataPost.place_food_address
+  const place_food_name = dataPost.place_food_name
+  const place_food_avatar = dataPost.place_food_avatar
+  const place_food_rate = dataPost.place_food_ratePlace
+  const place_food_total = dataPost.place_food_countPlace
+
 
   const onchange = (nativeEvent) => {
     if(nativeEvent){
@@ -37,19 +46,36 @@ const DetailFoodScreen = ({navigation}) => {
     navigation.goBack();
   }
 
+  const getSinglePost = async (post_id) => {
+    await axios.get(`${apiAdress}get-single-post/${post_id}`)
+    .then((response) => {
+      setDataPost(response.data.data[0])
+    }).catch(error => console.log(error))
+  }
+
+  useEffect(() => {
+    getSinglePost(idPost)
+  }, [])
+  
+
   return (
     <View style={styles.container}>
-      <Header directBack={directBack}/>
+      <View style={styles.header}>
+        <TouchableOpacity>  
+          <Feather onPress={() => directBack()} style={styles.iconBack} name="arrow-left"/>
+        </TouchableOpacity>
+        <Text numberOfLines={1} ellipsizeMode='tail' style={styles.headerText}>{post_title}</Text>
+      </View>
 
       <ScrollView showsVerticalScrollIndicator={true}>
 
         {/* User */}
         <View style={styles.user}>
           <View style={styles.infoUser}>
-            <Image resizeMode="contain" source={require('../../assets/img/user/user_test1.jpg')} style={{width: 40, height: 40, borderRadius: 40/2, borderWidth: 1}}/>
+            <Image resizeMode="contain" source={user_avatar ? {uri: user_avatar} : require(user_undefined)} style={{width: 40, height: 40, borderRadius: 40/2, borderWidth: 1}}/>
             <View>
-              <Text style={{paddingHorizontal: 8, fontSize: 13, color: color.black, fontFamily: 'nunito_semibold', paddingBottom: 3}}>Quang Nguyen</Text>
-              <Text style={{paddingHorizontal: 8, fontSize: 10, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>28/09/2022 lúc 19:30  •  Gà rán Popeyes - Bình Thạnh</Text>
+              <Text style={{paddingHorizontal: 8, fontSize: 13, color: color.black, fontFamily: 'nunito_semibold', paddingBottom: 3}}>{user_fullname}</Text>
+              <Text style={{paddingHorizontal: 8, fontSize: 10, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>{post_created_at}  •  {place_food_name} - {place_food_address}</Text>
             </View>
           </View>
         </View>
@@ -63,41 +89,38 @@ const DetailFoodScreen = ({navigation}) => {
             horizontal
             style={styles.wrapImageFood}>
               {
-                images.map((img) =>
-                  <Image key={img.id} resizeMode='contain' source={{uri: img.url}} style={styles.wrapImageFood}/>
-                )
+                // images.map((img) =>
+                //   <Image key={img.id} resizeMode='contain' source={{uri: img.url}} style={styles.wrapImageFood}/>
+                // )
+                <Image resizeMode='contain' source={{uri: post_image}} style={styles.wrapImageFood}/>
               }
           </ScrollView>
-          <View style={styles.wrapNumberImg}>
+          {/* <View style={styles.wrapNumberImg}>
             <Text style={styles.wrapPageNumber}>
               {(imgActive + 1)}/{images.length}
             </Text>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.content}>
-          <Text style={{fontFamily: 'nunito_bold', fontSize: 18}}>Gà rán sốt cay Hàn Quốc tại Bình Thạnh ngon ngon ngon</Text>
+          <Text style={{fontFamily: 'nunito_bold', fontSize: 18}}>{post_title}</Text>
           <Text style={{paddingVertical: 8, fontSize: 13}}>
-          <Entypo name="star" style={{fontSize: 13, color: color.main}}/> <Text style={{fontFamily: 'nunito_semibold'}}>4.3</Text>/5 điểm
+          <Entypo name="star" style={{fontSize: 13, color: color.main}}/> <Text style={{fontFamily: 'nunito_semibold'}}>{post_rate}</Text>/5 điểm
           </Text>
 
-          <Text style={{lineHeight: 25, fontFamily: 'nunito_normal'}}>Mọi người đã thử thưởng thức món này chưa?
-            Hôm trước thấy quán này có chướng trình khuyến mãi trên Now nên mình gọi thử về ăn . Cơ mà siu ngon luôn. Cơm dẻo, gà thơm, nước sốt cực đỉnh, quan trọng gà đến nơi vẫn ấm và giòn tan ăn cực đã ý. Mình là người ăn cay tốt nên mình chọn vị cay.. ăn rất thích nhưng mà lần sau sẽ gọi loại siêu cay xem thế nào. Gà giòn ăn cùng kim chi chua nhẹ rất hợp. À kim chi ở quán này ăn ngon phết đó mọi người. Hôm mình ăn quán còn đang có chương trình tặng gimpab nữa. Đơn hàng gửi đến hộp hiếc xin sò nhìn như ảnh luôn kèm theo cái gimpab siêu to khổng lồ kình ăn ko hết nổi. Gimpab ăn 1 nửa, 1 nửa chiều mới lấy ra ăn mà cơm vẫn dẻo ngon ý
-            Nói túm lại đây là quán online chất lượng nhất mà mình từng mò đươc trên Now. Chắc chắn sẽ ủng hộ quán dài dài
-            Share cho mọi người đường link cho dễ tìm kiếm nhé.
-          </Text>
+          <Text style={{lineHeight: 25, fontFamily: 'nunito_normal'}}>{post_content}</Text>
         </View>
 
         <TouchableOpacity style={styles.wrapFoodPlace}>
-          <Image style={styles.imgFoodPlace} source={{uri: 'https://kenh14cdn.com/2018/2/7/6-151797495481038039623.jpg '}}/>
+          <Image style={styles.imgFoodPlace} source={place_food_avatar ? {uri: place_food_avatar} : require(place_food_undefined)}/>
 
           <View style={styles.infoFoodPlace}>
-            <Text style={{fontFamily: 'nunito_bold', fontSize: 13}}>No Name Chicken - Gà rán Hotdog Q1</Text>
-            <Text style={{fontSize: 12, fontFamily: 'nunito_normal'}}>112 Kios 12 Phạm Viết Chánh, P. Nguyễn Cư Trinh, Q1, TPHCM</Text>
+            <Text style={{fontFamily: 'nunito_bold', fontSize: 13}}>{place_food_name}</Text>
+            <Text style={{fontSize: 12, fontFamily: 'nunito_normal'}}>{place_food_address}</Text>
             <Text style={{fontSize: 12}}>
               <Entypo name="star" style={{color: color.main}}/>
-              <Text style={{fontFamily: 'nunito_semibold'}}> 4.5
-              </Text>/5 điểm (15 bài review) 
+              <Text style={{fontFamily: 'nunito_semibold'}}> {place_food_rate}
+              </Text>/5 điểm ({place_food_total} bài review) 
             </Text>
           </View>
         </TouchableOpacity>
@@ -106,9 +129,9 @@ const DetailFoodScreen = ({navigation}) => {
           <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <TouchableOpacity>
-                <Ionicons style={{fontSize: 25, color: color.main}} name='heart'/>
+                <Ionicons style={{fontSize: 25, color: color.main}} name='heart-outline'/>
               </TouchableOpacity>
-              <Text style={{fontSize: 13, paddingLeft: 5, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>15 người thích</Text>
+              <Text style={{fontSize: 13, paddingLeft: 5, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>{post_vote} người thích</Text>
             </View>
             <Text style={{fontSize: 13, color: color.grayOriginal, fontFamily: 'nunito_normal'}}>2 bình luận</Text>
           </View>
@@ -117,7 +140,7 @@ const DetailFoodScreen = ({navigation}) => {
 
           <View style={{marginBottom: 100}}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Image resizeMode='contain' source={require('../../assets/img/user/user_test1.jpg')} style={{width: 40, height: 40, borderRadius: 24}}/>
+              <Image resizeMode='contain' source={user_avatar ? {uri: user_avatar} : require(user_undefined)} style={{width: 40, height: 40, borderRadius: 24}}/>
               <TextInput style={{paddingHorizontal: 15, width: '85%', height: 40, backgroundColor: color.grayBackgroundImg, borderRadius: 20, fontFamily: 'nunito_semibold'}} placeholder="Viết bình luận..."/>
             </View>
           </View>
@@ -189,5 +212,24 @@ const styles = StyleSheet.create({
   reacts:{
     width: WIDTH - 20,
     marginHorizontal: 10,
+  },
+  header:{
+    height: 50,
+    backgroundColor: color.main,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBack:{  
+    paddingHorizontal: 8,
+    fontSize: 20,
+    color: color.white,
+  },
+  headerText:{
+    color: color.white,
+    width: 350,
+    fontSize: 16,
+    fontFamily: 'nunito_bold',
+    paddingHorizontal: 10,
+    
   }
 });

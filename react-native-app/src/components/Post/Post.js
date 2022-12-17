@@ -6,6 +6,7 @@ import color from "../../color";
 import { callAxios } from "../../api/callAxios";
 import { apiAdress, storagePost, storageUser } from "../../api/apiAddress";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {firebase} from "../../../config"
 
 const Post = (props) => {
   const [dataPost, setDataPost] = useState([])
@@ -13,6 +14,7 @@ const Post = (props) => {
   const [isLoading, setLoading] = useState(true)
 
   const urlGetPosts = apiAdress + 'posts';
+  const user_undefined = 'react-native-app/assets/user_undefined.jpg'
 
   const fetchPosts = async () => {
     await axios.get(urlGetPosts)
@@ -25,9 +27,21 @@ const Post = (props) => {
     })
   }
 
+  // const fetchImageAvatar = async (image) => {
+  //   let avatar = ''
+  //   await firebase.storage().ref('avatar/' + image).getDownloadURL().then((result) => {
+  //     avatar = result
+  //   })
+
+  //   return avatar
+  // }
+
   useEffect(() => {
-    fetchPosts();
-  }, [])
+    const unsubscribe = props.directDetailFood.addListener('focus', () => {
+      fetchPosts();
+    })
+    return unsubscribe;
+  }, [props.directDetailFood])
   
   return (
     <View style={styles.post}>
@@ -38,12 +52,15 @@ const Post = (props) => {
           isLoading ? <ActivityIndicator style={{flex: 1, justifyContent: 'center', alignItems: 'center', minHeight: 300}} size="large" color={color.main} /> :
 
           dataPost.map((post) => (
-            <TouchableOpacity style={[styles.panelPost, styles.shadowBorder]} key={post.id} onPress={props.directDetailFood}>
-              <Image resizeMode="cover" source={{ uri: storagePost + post.image_food}} style={styles.image}/>
+            <TouchableOpacity style={[styles.panelPost, styles.shadowBorder]} key={post.id} onPress={() => props.directDetailFood.navigate('DetailScreen',{
+              idPost: post.id,
+              idFoodPlace: post.id_food_place
+            })}>
+              <Image resizeMode="cover" source={{ uri: post.image}} style={styles.image}/>
               <Text style={styles.titlePost}>{post.title}</Text>
               <View style={styles.bottomPanel}>
                 <View style={styles.infoUser}>
-                  <Image resizeMode="contain" source={{uri: storageUser + post.avatar}} style={{width: 30, height: 30, borderRadius: 30/2, borderWidth: 1}}/>
+                  <Image resizeMode="contain" source={(post.avatar) ? {uri: post.avatar} : require(user_undefined)} style={{width: 30, height: 30, borderRadius: 30/2, borderWidth: 1}}/>
                   <Text style={{paddingHorizontal: 8, fontSize: 10, color: color.black, fontFamily: 'nunito_normal'}}>{post.fullname}</Text>
                 </View>
 

@@ -26,11 +26,8 @@ const AccountInfoScreen = ({navigation}) => {
 useEffect(() => {
   setLoadingAvatar(true)
   if(userInfo.user.avatar != null){
-    firebase.storage().ref('avatar').child(userInfo.user.avatar).getDownloadURL()
-    .then((url) => {
-      setAvatar(url)
+    setAvatar(userInfo.user.avatar)
       setLoadingAvatar(false)
-    }).catch(error => console.log(error))
   }else{
     setAvatar(null)
     setLoadingAvatar(false)
@@ -92,7 +89,7 @@ const styles = StyleSheet.create({
   infoUser:{
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 70,
+    marginTop: 20,
     marginBottom: 10
   },
   statistics:{
